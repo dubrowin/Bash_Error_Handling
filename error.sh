@@ -1,8 +1,12 @@
 #!/bin/bash
 
+## Error file
 ERROR="/tmp/$( basename "$0" ).$$.error"
 
+## Capture any errors and execute Error Handler Function
 trap 'error_handler $? $LINENO' ERR
+
+## Functions
 
 Debug () {
         if [ "$DEBUG" == "Y" ]; then
@@ -19,13 +23,10 @@ Debug () {
 }
 
 error_handler() {
-	  #echo "Error: ($1) occurred on $2"
-	  #printf "%d\n" $1
-	  #local lc="$BASH_COMMAND" rc=`cat $ERROR`
-	    #echo "Command [$lc] exited with code [$rc]"
-	  # https://www.howtogeek.com/821320/how-to-trap-errors-in-bash-scripts-on-linux/
+	  # Capture important variables
 	  local lc="$BASH_COMMAND" rc=$? ERRLINE="$2"
 
+	  # Add useful details to error codes
 	  case $rc in
 		1)
 			 BIGERROR="Catchall for general errors"
@@ -64,21 +65,20 @@ error_handler() {
 			;;
 	esac
 
+	## Enable Debugging
 	  DEBUG="Y"
+
+	## 2 Forms of error reporting, with an output file and without
 	  if [ ! -s $ERROR ]; then
 		# The below is set to echo, but in a "real" script, we could use Debug
 	    	Debug "Error1: Command [$lc], line $ERRLINE:, exited [code $rc, $BIGERROR]"
 	  else
 	  	Debug "Error2: Command [$lc] `cat $ERROR`"
 	  fi
-	  #exit 1
+	  exit 1
   }
 
-#function error_handler {
-	#echo "Error: ($?) $( cat $ERROR )"
-	  #exit 1
-#}
-
+## Sample Commands
 bad_command ABC XYZ 
 bad_command ABC XYZ 2> $ERROR
 echo "foo" 
